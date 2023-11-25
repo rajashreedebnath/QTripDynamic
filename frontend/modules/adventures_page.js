@@ -5,6 +5,10 @@ import config from "../conf/index.js";
 function getCityFromURL(search) {
   // TODO: MODULE_ADVENTURES
   // 1. Extract the city id from the URL's Query Param and return it
+  const urlSearchParams = new URLSearchParams(search);
+  const cityParam = urlSearchParams.get("city");
+
+  return cityParam;
 
 }
 
@@ -12,6 +16,20 @@ function getCityFromURL(search) {
 async function fetchAdventures(city) {
   // TODO: MODULE_ADVENTURES
   // 1. Fetch adventures using the Backend API and return the data
+  try {
+    const response = await fetch(`${config.backendEndpoint}/adventures?city=${city}`);
+    
+    if (!response.ok) {
+      console.error(`${response.status}`);
+      return null;
+    }
+
+    const adventuresData = await response.json();
+    return adventuresData;
+  } catch (error) {
+    console.error(error.message);
+    return null;
+  }
 
 }
 
@@ -19,6 +37,50 @@ async function fetchAdventures(city) {
 function addAdventureToDOM(adventures) {
   // TODO: MODULE_ADVENTURES
   // 1. Populate the Adventure Cards and insert those details into the DOM
+  let data = document.getElementById("data");
+  
+  adventures.forEach((ele) =>
+  {
+    let divtag = document.createElement("div");
+
+    divtag.className = "col-6 col-lg-3 mb-3 position-relative";
+
+    // let {id,name, costPerHead, currency, image, duration, category} = ele;
+
+    divtag.innerHTML = `
+
+    <a id = "${ele.id}" href="detail/?adventure=${ele.id}">
+
+        <div class="activity-card">
+
+          <img src="${ele.image}" class ="activity-card img" alt="..." />
+
+          <div class ="category-banner">${ele.category}</div>
+
+          <div class="d-md-flex justify-content-between w-100 p-2">
+
+            <h5>${ele.name}</h5>
+
+            <p>${ele.currency} ${ele.costPerHead}</p>
+
+          </div>
+
+          <div class="d-md-flex justify-content-between w-100 p-2">
+
+            <h5>Duration</h5>
+
+            <p>${ele.duration} Hours</p>
+
+          </div>
+
+        </div>
+
+      </a>`;
+
+      data.appendChild(divtag);
+
+  });
+
 
 }
 
