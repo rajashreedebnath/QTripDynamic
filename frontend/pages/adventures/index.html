@@ -147,6 +147,14 @@
             // 1. Change the DOM to show the selected duration filter. Use the provided input event
             // 2. Invoke saveFiltersToLocalStorage here
 
+            //Create filters for adventures -> Milestone-2
+            document.getElementById("data").innerHTML = "";
+            filters.duration = event.target.value;
+            let filteredAdventures = filterFunction(adventures, filters);
+
+            addAdventureToDOM(filteredAdventures);
+            saveFiltersToLocalStorage(filters);
+
         }
 
         //executed when clear button is clicked on duration filter dropdown
@@ -154,6 +162,15 @@
             // TODO: MODULE_FILTERS
             // 1. Change the DOM to clear the Duration filter. Refer clearCategory() below
             // 2. Invoke saveFiltersToLocalStorage here
+
+            //Create filters for adventures -> Milestone-2
+            document.getElementById("duration-select").selectedIndex = 0;
+            document.getElementById("data").innerHTML = "";
+            filters.duration = "";
+            let filteredAdventures = filterFunction(adventures, filters);
+
+            addAdventureToDOM(filteredAdventures);
+            saveFiltersToLocalStorage(filters);
 
         }
 
@@ -177,6 +194,9 @@
 
             // TODO: MODULE_FILTERS
             // 1. Invoke saveFiltersToLocalStorage here
+
+            //Create filters for adventures -> Milestone-1
+            saveFiltersToLocalStorage(filters);
         }
 
         //executed when clear button is clicked on category filter dropdown
@@ -190,7 +210,40 @@
 
             // TODO: MODULE_FILTERS
             // 1. Invoke saveFiltersToLocalStorage here
+
+            //Create filters for adventures -> Milestone-1
+            saveFiltersToLocalStorage(filters);
         }
+
+
+
+
+        //TODO (Optional) - Populate the filter pills - remove one of the Categories from the filters
+
+
+        // Function to remove a specific category filter
+        window.removeCategoryFilter = function(category) {
+
+
+            document.getElementById("data").textContent = "";
+            document.getElementById("category-list").textContent = "";
+
+            // Remove the specified category from filters
+            filters["category"] = filters["category"].filter((cat) => cat !== category);
+
+            // Clear existing pills
+            document.getElementById("category-list").innerHTML = "";
+
+            // Update filter pills and DOM
+            generateFilterPillsAndUpdateDOM(filters);
+
+            // Apply filters and update adventure list
+            let filteredAdventures = filterFunction(adventures, filters);
+            addAdventureToDOM(filteredAdventures);
+
+            // Invoke saveFiltersToLocalStorage
+            saveFiltersToLocalStorage(filters);
+        };
 
         //helper function
         function onlyUnique(value, index, self) {

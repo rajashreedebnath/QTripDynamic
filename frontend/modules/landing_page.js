@@ -62,6 +62,9 @@ function addCityToDOM(id, city, description, image) {
   // 1. Populate the City details and insert those details into the DOM
 
 
+  
+  //Create the city cards for QTrip landing page -> Milestone-3
+
   const cityCard = document.createElement("div")
   cityCard.className = "col-sm-6 col-lg-3 my-4";
   const anchor = document.createElement("a")

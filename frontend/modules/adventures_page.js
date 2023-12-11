@@ -1,87 +1,64 @@
-
 import config from "../conf/index.js";
 
 //Implementation to extract city from query params
 function getCityFromURL(search) {
   // TODO: MODULE_ADVENTURES
   // 1. Extract the city id from the URL's Query Param and return it
-  const urlSearchParams = new URLSearchParams(search);
-  const cityParam = urlSearchParams.get("city");
 
-  return cityParam;
+  //Create the cards for adventures grid page - Milestone-1
+  let city = search.split("=")[1];
+  return city;
 
+  // console.log(search)
+  //     let params = new URLSearchParams(search);
+  //     console.log(params.get('city'))
+  //    return params.get('city')
 }
 
 //Implementation of fetch call with a paramterized input based on city
 async function fetchAdventures(city) {
   // TODO: MODULE_ADVENTURES
   // 1. Fetch adventures using the Backend API and return the data
-  try {
-    const response = await fetch(`${config.backendEndpoint}/adventures?city=${city}`);
-    
-    if (!response.ok) {
-      console.error(`${response.status}`);
-      return null;
-    }
 
-    const adventuresData = await response.json();
-    return adventuresData;
-  } catch (error) {
-    console.error(error.message);
+  //Create the cards for adventures grid page - Milestone-2
+  try {
+    let response = await fetch(
+      `${config.backendEndpoint}/adventures?city=${city}`
+    );
+    let adventures = await response.json();
+    console.log(adventures);
+    return adventures;
+  } catch (err) {
     return null;
   }
-
 }
 
 //Implementation of DOM manipulation to add adventures for the given city from list of adventures
 function addAdventureToDOM(adventures) {
   // TODO: MODULE_ADVENTURES
   // 1. Populate the Adventure Cards and insert those details into the DOM
-  let data = document.getElementById("data");
-  
-  adventures.forEach((ele) =>
-  {
-    let divtag = document.createElement("div");
 
-    divtag.className = "col-6 col-lg-3 mb-3 position-relative";
-
-    // let {id,name, costPerHead, currency, image, duration, category} = ele;
-
-    divtag.innerHTML = `
-
-    <a id = "${ele.id}" href="detail/?adventure=${ele.id}">
-
-        <div class="activity-card">
-
-          <img src="${ele.image}" class ="activity-card img" alt="..." />
-
-          <div class ="category-banner">${ele.category}</div>
-
-          <div class="d-md-flex justify-content-between w-100 p-2">
-
-            <h5>${ele.name}</h5>
-
-            <p>${ele.currency} ${ele.costPerHead}</p>
-
+  //Create the cards for adventures grid page -> Milestone - 3
+  adventures.forEach((element) => {
+    let div = document.createElement("div");
+    div.className = "col-xl-3 col-lg-4 col-sm-6 mb-3";
+    div.innerHTML = `
+      <a href="detail/?adventure=${element.id}" id="${element.id}">
+         <div class="activity-card">
+          <img src=${element.image} class="activity-card img" alt=${element.name}>
+          <div class="category-banner">${element.category}</div>
+          <div class="card-body d-md-flex justify-content-between flex-wrap" style="width:100%;">
+            <h5 class="card-title">${element.name}</h5>
+            <h6 class="card-text">₹${element.costPerHead}</h6>
           </div>
-
-          <div class="d-md-flex justify-content-between w-100 p-2">
-
-            <h5>Duration</h5>
-
-            <p>${ele.duration} Hours</p>
-
-          </div>
-
+          <div class="card-body d-md-flex justify-content-between flex-wrap" style="width:100%;">
+          <h5 class="card-title">Duration</h5>
+          <h6 class="card-text">${element.duration}</h6>
+         </div>
         </div>
-
       </a>`;
-
-      data.appendChild(divtag);
-
+    document.getElementById("data").appendChild(div);
   });
-
-
 }
 
 //Implementation of filtering by duration which takes in a list of adventures, the lower bound and upper bound of duration and returns a filtered list of adventures.
@@ -89,13 +66,25 @@ function filterByDuration(list, low, high) {
   // TODO: MODULE_FILTERS
   // 1. Filter adventures based on Duration and return filtered list
 
+  //Create filters for adventures -> Milestone-2
+  let newlist = list.filter(
+    (element) => low <= element.duration && element.duration <= high
+  );
+  console.log(newlist);
+  return newlist;
 }
 
 //Implementation of filtering by category which takes in a list of adventures, list of categories to be filtered upon and returns a filtered list of adventures.
 function filterByCategory(list, categoryList) {
   // TODO: MODULE_FILTERS
   // 1. Filter adventures based on their Category and return filtered list
-
+  
+  
+  //Create filters for adventures -> Milestone-1
+  let newlist = list.filter((element) =>
+    categoryList.includes(element.category)
+  );
+  return newlist;
 }
 
 // filters object looks like this filters = { duration: "", category: [] };
@@ -111,6 +100,17 @@ function filterFunction(list, filters) {
   // 2. Depending on which filters are needed, invoke the filterByDuration() and/or filterByCategory() methods
 
 
+  //Create filters for adventures -> Milestone-1
+  if (filters.category.length > 0)
+    list = filterByCategory(list, filters.category);
+  if (filters.duration.length > 0) {
+    list = filterByDuration(
+      list,
+      filters.duration.split("-")[0],
+      filters.duration.split("-")[1]
+    );
+  }
+  console.log(list, filters);
   // Place holder for functionality to work in the Stubs
   return list;
 }
@@ -120,6 +120,8 @@ function saveFiltersToLocalStorage(filters) {
   // TODO: MODULE_FILTERS
   // 1. Store the filters as a String to localStorage
 
+  //Create filters for adventures -> Milestone-1
+  window.localStorage.setItem("filters", JSON.stringify(filters));
   return true;
 }
 
@@ -128,7 +130,8 @@ function getFiltersFromLocalStorage() {
   // TODO: MODULE_FILTERS
   // 1. Get the filters from localStorage and return String read as an object
 
-
+  //Create filters for adventures -> Milestone-1
+  let localfilters = JSON.parse(window.localStorage.getItem("filters"));
   // Place holder for functionality to work in the Stubs
   return null;
 }
@@ -141,7 +144,24 @@ function generateFilterPillsAndUpdateDOM(filters) {
   // TODO: MODULE_FILTERS
   // 1. Use the filters given as input, update the Duration Filter value and Generate Category Pills
 
+  //Create filters for adventures -> Milestone-1
+  
+  document.getElementById("duration-select").value = filters.duration;
+
+  // Clear existing pills
+  document.getElementById("category-list").innerHTML = "";
+
+  //Iterates over category filters and inserts category pilla into DOM
+  filters["category"].forEach((key) => {
+    let ele = document.createElement("div");
+    ele.className = "category-filter";
+    ele.innerHTML = `<div>${key}<span class="remove-filter" onclick="removeCategoryFilter('${key}')">
+                      <span style="color: red; cursor: pointer">x</span></span></div>`;
+    document.getElementById("category-list").appendChild(ele);
+  });
+
 }
+
 export {
   getCityFromURL,
   fetchAdventures,
