@@ -31,22 +31,17 @@ async function fetchAdventureDetails(adventureId) {
   //Create the adventure details page - Milestone1
   try {
     // 1. Build the URL for the backend API using the configured endpoint and adventure ID.
-    const url = `${config.backendEndpoint}/adventures/detail?adventure=${adventureId}`;
-
     // 2. Make the fetch call to the backend API.
-    const response = await fetch(url);
+    const response = await fetch(
+      config.backendEndpoint + `/adventures/detail?adventure=${adventureId}`
+    );
+    
+    // 3. Parse the JSON data from the response.
+    const adventureDetails = await response.json();
 
-    // 3. Check if the response is successful (status code 200).
-    if (response.ok) {
-      // 4. Parse the JSON data from the response.
-      const adventureDetails = await response.json();
+    // 4. Return the adventure details.
+    return adventureDetails;
 
-      // 5. Return the adventure details.
-      return adventureDetails;
-    } else {
-      // 6. If the response is not successful, throw an error.
-      throw new Error(`${response.status}`);
-    }
   } catch (error) {
     return null; // Or handle the error in an appropriate way for your application.
   }
@@ -58,33 +53,29 @@ async function fetchAdventureDetails(adventureId) {
 
 //Implementation of DOM manipulation to add adventure details to DOM
 function addAdventureDetailsToDOM(adventure) {
+
   // TODO: MODULE_ADVENTURE_DETAILS
   // 1. Add the details of the adventure to the HTML DOM
 
 
-  // Get the HTML elements where details need to be inserted by using their element ids
-  const adventureNameElement = document.getElementById("adventure-name");
-  const adventureSubtitleElement = document.getElementById("adventure-subtitle");
-  const photoGalleryElement = document.getElementById("photo-gallery");
-  const adventureContentElement = document.getElementById("adventure-content");
+  document.getElementById("adventure-name").innerHTML = adventure.name;
 
-  // Use these fields from the adventure details to populate the DOM
-  const { name, subtitle, images, content } = adventure;
+  document.getElementById("adventure-subtitle").innerHTML = adventure.subtitle;
 
-  // Insert the adventure name and subtitle into the DOM
-  adventureNameElement.textContent = name;
-  adventureSubtitleElement.textContent = subtitle;
-
-  // Loop through the images, create a div element for each, and insert it into the photo-gallery
-  images.forEach((image) => {
-    const imageDiv = document.createElement("div");
-    imageDiv.className = "col-12 mb-3"; // Adjust the classes as needed
-    imageDiv.innerHTML = `<img src="${image}" class="activity-card-image img-fluid" alt="Adventure Image" />`;
-    photoGalleryElement.appendChild(imageDiv);
+  adventure.images.map((image) => {
+    let ele = document.createElement("div");
+    ele.className = "col-lg-12";
+    ele.innerHTML = `
+    <img
+      src="${image}"
+      class="activity-card-image pb-3 pb-md-0"
+      alt="Adventure Image"
+      srcset=""
+    />`;
+    document.getElementById("photo-gallery").appendChild(ele);
   });
 
-  // Insert the adventure content into the DOM
-  adventureContentElement.innerHTML = `${content}`;
+  document.getElementById("adventure-content").innerHTML = adventure.content;
 
 }
 
@@ -94,92 +85,44 @@ function addBootstrapPhotoGallery(images) {
   // 1. Add the bootstrap carousel to show the Adventure images
 
 
-  // Get the HTML element where the gallery needs to be inserted by using its element id
-  const photoGalleryElement = document.getElementById("photo-gallery");
+  document.getElementById("photo-gallery").innerHTML = `
+  <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
 
-  // Clear any existing content in the photo-gallery element
-  photoGalleryElement.innerHTML = '';
+    <div class="carousel-inner" id="carousel-inner">
 
-  // Create the carousel container and inner elements
-  const carouselContainer = document.createElement("div");
-  carouselContainer.id = "carouselExampleIndicators";
-  carouselContainer.className = "carousel slide";
-  carouselContainer.setAttribute("data-bs-ride", "carousel");
+    </div>
 
-  // Create the carousel indicators
-  const carouselIndicators = document.createElement("div");
-  carouselIndicators.className = "carousel-indicators";
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>`
 
-  // Create the carousel inner element
-  const carouselInner = document.createElement("div");
-  carouselInner.className = "carousel-inner";
 
-  // Loop through the images, create a div element for each, and insert it into the carousel-inner
-  images.forEach((image, index) => {
-    const carouselIndicator = document.createElement("button");
-    carouselIndicator.type = "button";
-    carouselIndicator.setAttribute("data-bs-target", "#carouselExampleIndicators");
-    carouselIndicator.setAttribute("data-bs-slide-to", index.toString());
-    carouselIndicator.className = index === 0 ? "active" : "";
-    carouselIndicator.setAttribute("aria-label", `Slide ${index + 1}`);
-
-    const carouselItem = document.createElement("div");
-    carouselItem.className = `carousel-item ${index === 0 ? "active" : ""}`;
-
-    const imgElement = document.createElement("img");
-    imgElement.src = image;
-    imgElement.className = "d-block w-100";
-    imgElement.alt = `Slide ${index + 1}`;
-
-    // Append the indicator and item to their respective parent elements
-    carouselIndicators.appendChild(carouselIndicator);
-    carouselItem.appendChild(imgElement);
-    carouselInner.appendChild(carouselItem);
+  images.forEach((image, idx) => {
+    let ele = document.createElement("div");
+    ele.className = `carousel-item ${idx === 0 ? "active" : ""}`;
+    ele.innerHTML = `
+    <img
+      src="${image}"
+      class="activity-card-image pb-3 pb-md-0"
+      alt="Adventure Image"
+      srcset=""
+    />`;
+    document.getElementById("carousel-inner").appendChild(ele);
   });
 
-  // Create the carousel controls (arrows)
-  const prevButton = document.createElement("button");
-  prevButton.className = "carousel-control-prev";
-  prevButton.type = "button";
-  prevButton.setAttribute("data-bs-target", "#carouselExampleIndicators");
-  prevButton.setAttribute("data-bs-slide", "prev");
 
-  const prevIcon = document.createElement("span");
-  prevIcon.className = "carousel-control-prev-icon";
-  prevIcon.setAttribute("aria-hidden", "true");
-
-  const prevText = document.createElement("span");
-  prevText.className = "visually-hidden";
-  prevText.textContent = "Previous";
-
-  prevButton.appendChild(prevIcon);
-  prevButton.appendChild(prevText);
-
-  const nextButton = document.createElement("button");
-  nextButton.className = "carousel-control-next";
-  nextButton.type = "button";
-  nextButton.setAttribute("data-bs-target", "#carouselExampleIndicators");
-  nextButton.setAttribute("data-bs-slide", "next");
-
-  const nextIcon = document.createElement("span");
-  nextIcon.className = "carousel-control-next-icon";
-  nextIcon.setAttribute("aria-hidden", "true");
-
-  const nextText = document.createElement("span");
-  nextText.className = "visually-hidden";
-  nextText.textContent = "Next";
-
-  nextButton.appendChild(nextIcon);
-  nextButton.appendChild(nextText);
-
-  // Append the carousel components to the carousel container
-  carouselContainer.appendChild(carouselIndicators);
-  carouselContainer.appendChild(carouselInner);
-  carouselContainer.appendChild(prevButton);
-  carouselContainer.appendChild(nextButton);
-
-  // Append the carousel container to the photo gallery element
-  photoGalleryElement.appendChild(carouselContainer);
+  
 
 }
 
