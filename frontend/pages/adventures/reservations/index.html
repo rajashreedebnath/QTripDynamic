@@ -79,7 +79,6 @@
         } from "../../../modules/reservation_page.js";
         (async function () {
             const reservations = await fetchReservations();
-            console.log("reservations",reservations)
             addReservationToTable(reservations);
         })();
 
